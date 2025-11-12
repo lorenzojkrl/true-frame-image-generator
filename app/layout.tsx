@@ -15,8 +15,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI SDK Image Generator",
-  description: "An open-source AI image generator using the AI SDK by Vercel",
+  title: "True Frame",
+  description:
+    "True Frame is a platform for creating images for business content.",
 };
 
 export default function RootLayout({

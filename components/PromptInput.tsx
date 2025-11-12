@@ -66,12 +66,12 @@ export function PromptInput({
           />
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center justify-between space-x-2">
-              <button
+              {/* <button
                 onClick={updateSuggestions}
                 className="flex items-center justify-between px-2 rounded-lg py-1 bg-background text-sm hover:opacity-70 group transition-opacity duration-200"
               >
                 <RefreshCw className="w-4 h-4 text-zinc-500 group-hover:opacity-70" />
-              </button>
+              </button> */}
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
@@ -81,8 +81,8 @@ export function PromptInput({
                     index > 2
                       ? "hidden md:flex"
                       : index > 1
-                        ? "hidden sm:flex"
-                        : "",
+                      ? "hidden sm:flex"
+                      : ""
                   )}
                 >
                   <span>

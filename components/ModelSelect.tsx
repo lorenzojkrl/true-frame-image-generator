@@ -67,7 +67,10 @@ export function ModelSelect({
 
   return (
     <Card
-      className={cn(`w-full transition-opacity`, enabled ? "" : "opacity-50")}
+      className={cn(
+        `w-full max-w-[600px] transition-opacity`,
+        enabled ? "" : "opacity-50"
+      )}
     >
       <CardContent className="pt-6 h-full">
         <div className="flex items-center justify-between gap-2 mb-4">

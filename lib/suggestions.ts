@@ -7,112 +7,24 @@ const artStyles = ["anime", "art nouveau", "ukiyo-e", "watercolor"];
 
 const basePrompts: { text: string; prompt: string }[] = [
   {
-    text: "Salamander Dusk",
-    prompt: "A salamander at dusk in a forest pond",
-  },
-  {
-    text: "Sultry Chicken",
+    text: "Cinematic rubik cube",
     prompt:
-      "A sultry chicken peering around the corner from shadows, clearly up to no good",
+      "A dramatic, cinematic image of a worn, scratched, and vintage Rubik's Cube tumbling down a grand flight of white marble stairs. The scene is set outdoors at the entrance of a stately building on an overcast autumn dusk. Soft, diffused light creates a moody atmosphere, with sharp contrasts and strong shadows adding to the drama. Vibrant red and yellow autumn leaves are scattered across the stairs. The perspective is a dynamic blend of close-up detail on the cube's texture and the marble's surface, alongside a wider shot that captures the full descent of the stairs, which run from left to right. The cube appears to be falling in the same left-to-right direction",
   },
   {
-    text: "Cat Vercel",
-    prompt: "A cat launching its website on Vercel",
-  },
-  {
-    text: "Red Panda",
+    text: "Freshly glazed tea bowl",
     prompt:
-      "A red panda sipping tea under cherry blossoms at sunset with Mount Fuji in the background",
+      "A photorealistic close-up portrait of an elderly Japanese ceramicist with deep, sun-etched wrinkles and a warm, knowing smile. He is carefully inspecting a freshly glazed tea bowl. The setting is his rustic, sun-drenched workshop. The scene is illuminated by soft, golden hour light streaming through a window, highlighting the fine texture of the clay. Captured with an 85mm portrait lens, resulting in a soft, blurred background (bokeh). The overall mood is serene and masterful. Vertical portrait orientation.",
   },
   {
-    text: "Beach Otter",
-    prompt: "A mischievous otter surfing the waves in Bali at golden hour",
-  },
-  {
-    text: "Badger Ramen",
-    prompt: "A pensive honey badger eating a bowl of ramen in Osaka",
-  },
-  {
-    text: "Zen Frog",
+    text: "Ceramic coffee mug",
     prompt:
-      "A frog meditating on a lotus leaf in a tranquil forest pond at dawn, surrounded by fireflies",
+      "A high-resolution, studio-lit product photograph of a minimalist ceramic coffee mug in matte black, presented on a polished concrete surface. The lighting is a three-point softbox setup designed to create soft, diffused highlights and eliminate harsh shadows. The camera angle is a slightly elevated 45-degree shot to showcase its clean lines. Ultra-realistic, with sharp focus on the steam rising from the coffee. Square image.",
   },
   {
-    text: "Macaw Love",
+    text: "minimalist composition",
     prompt:
-      "A colorful macaw delivering a love letter, flying over the Grand Canyon at sunrise",
-  },
-  {
-    text: "Fox Painting",
-    prompt: "A fox walking through a field of lavender with a golden sunset",
-  },
-  {
-    text: "Armadillo Aerospace",
-    prompt:
-      "An armadillo in a rocket at countdown preparing to blast off to Mars",
-  },
-  {
-    text: "Penguin Delight",
-    prompt: "A penguin in pajamas eating ice cream while watching television",
-  },
-  {
-    text: "Echidna Library",
-    prompt:
-      "An echidna reading a book in a cozy library built into the branches of a eucalyptus tree",
-  },
-  {
-    text: "Capybara Onsen",
-    prompt:
-      "A capybara relaxing in a hot spring surrounded by snow-covered mountains with a waterfall in the background",
-  },
-  {
-    text: "Lion Throne",
-    prompt:
-      "A regal lion wearing a crown, sitting on a throne in a jungle palace, with waterfalls in the distance",
-  },
-  {
-    text: "Dolphin Glow",
-    prompt:
-      "A dolphin leaping through a glowing ring of bioluminescence under a starry sky",
-  },
-  {
-    text: "Owl Detective",
-    prompt:
-      "An owl wearing a monocle and top hat, solving a mystery in a misty forest at midnight",
-  },
-  {
-    text: "Jellyfish Cathedral",
-    prompt:
-      "A jellyfish floating gracefully in an underwater cathedral made of coral and glass",
-  },
-  {
-    text: "Platypus River",
-    prompt: "A platypus foraging in a river with a sunset in the background",
-  },
-  {
-    text: "Chameleon Urban",
-    prompt:
-      "A chameleon blending into a graffiti-covered wall in an urban jungle",
-  },
-  {
-    text: "Tortoise Oasis",
-    prompt:
-      "A giant tortoise slowly meandering its way to an oasis in the desert",
-  },
-  {
-    text: "Hummingbird Morning",
-    prompt:
-      "A hummingbird sipping nectar from a purple bougainvillea at sunrise, captured mid-flight",
-  },
-  {
-    text: "Polar Bear",
-    prompt:
-      "A polar bear clambering onto an iceberg to greet a friendly harbor seal as dusk falls",
-  },
-  {
-    text: "Lemur Sunbathing",
-    prompt:
-      "A ring-tailed lemur sunbathing on a rock in Madagascar in early morning light",
+      "A minimalist composition featuring a single, delicate red maple leaf positioned in the bottom-right of the frame. The background is a vast, empty off-white canvas, creating significant negative space for text. Soft, diffused lighting from the top left. Square image.",
   },
 ];
 

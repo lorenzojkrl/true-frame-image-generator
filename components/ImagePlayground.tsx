@@ -35,7 +35,7 @@ export function ImagePlayground({
     Record<ProviderKey, string>
   >(MODEL_CONFIGS.performance);
   const [enabledProviders, setEnabledProviders] = useState(
-    initializeProviderRecord(true),
+    initializeProviderRecord(true)
   );
   const [mode, setMode] = useState<ModelMode>("performance");
   const toggleView = () => {
@@ -78,15 +78,6 @@ export function ImagePlayground({
     <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <Header />
-        <PromptInput
-          onSubmit={handlePromptSubmit}
-          isLoading={isLoading}
-          showProviders={showProviders}
-          onToggleProviders={toggleView}
-          mode={mode}
-          onModeChange={handleModeChange}
-          suggestions={suggestions}
-        />
         <>
           {(() => {
             const getModelProps = () =>
@@ -118,10 +109,10 @@ export function ImagePlayground({
 
             return (
               <>
-                <div className="md:hidden">
+                {/* <div className="md:hidden">
                   <ModelCardCarousel models={getModelProps()} />
-                </div>
-                <div className="hidden md:grid md:grid-cols-2 2xl:grid-cols-4 gap-8">
+                  </div> */}
+                <div className="hidden md:flex justify-center flex-wrap gap-8">
                   {getModelProps().map((props) => (
                     <ModelSelect key={props.label} {...props} />
                   ))}
@@ -135,6 +126,15 @@ export function ImagePlayground({
             );
           })()}
         </>
+        <PromptInput
+          onSubmit={handlePromptSubmit}
+          isLoading={isLoading}
+          showProviders={showProviders}
+          onToggleProviders={toggleView}
+          mode={mode}
+          onModeChange={handleModeChange}
+          suggestions={suggestions}
+        />
       </div>
     </div>
   );
