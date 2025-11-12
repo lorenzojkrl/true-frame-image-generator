@@ -4,6 +4,16 @@ import { getRandomSuggestions, Suggestion } from "@/lib/suggestions";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PROVIDERS, ProviderKey, PROVIDER_ORDER } from "@/lib/provider-config";
+import { imageHelpers } from "@/lib/image-helpers";
 
 type QualityMode = "performance" | "quality";
 
@@ -15,12 +25,18 @@ interface PromptInputProps {
   mode: QualityMode;
   onModeChange: (mode: QualityMode) => void;
   suggestions: Suggestion[];
+  selectedModels: Record<ProviderKey, string>;
+  onModelChange: (providerKey: ProviderKey, model: string) => void;
+  enabledProviders: Record<ProviderKey, boolean>;
 }
 
 export function PromptInput({
   suggestions: initSuggestions,
   isLoading,
   onSubmit,
+  selectedModels,
+  onModelChange,
+  enabledProviders,
 }: PromptInputProps) {
   const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>(initSuggestions);
@@ -94,17 +110,46 @@ export function PromptInput({
                 </button>
               ))}
             </div>
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading || !input.trim()}
-              className="h-8 w-8 rounded-full bg-black flex items-center justify-center disabled:opacity-50"
-            >
-              {isLoading ? (
-                <Spinner className="w-3 h-3 text-white" />
-              ) : (
-                <ArrowUp className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2">
+              {PROVIDER_ORDER.filter((key) => enabledProviders[key]).map(
+                (providerKey) => {
+                  const provider = PROVIDERS[providerKey];
+                  return (
+                    <Select
+                      key={providerKey}
+                      value={selectedModels[providerKey]}
+                      onValueChange={(model) =>
+                        onModelChange(providerKey, model)
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-[140px] text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {provider.models.map((model) => (
+                            <SelectItem key={model} value={model}>
+                              {imageHelpers.formatModelId(model)}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  );
+                }
               )}
-            </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading || !input.trim()}
+                className="h-8 w-8 rounded-full bg-black flex items-center justify-center disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <Spinner className="w-3 h-3 text-white" />
+                ) : (
+                  <ArrowUp className="w-5 h-5 text-white" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

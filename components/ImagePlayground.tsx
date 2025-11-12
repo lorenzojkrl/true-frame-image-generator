@@ -134,6 +134,9 @@ export function ImagePlayground({
           mode={mode}
           onModeChange={handleModeChange}
           suggestions={suggestions}
+          selectedModels={selectedModels}
+          onModelChange={handleModelChange}
+          enabledProviders={enabledProviders}
         />
       </div>
     </div>

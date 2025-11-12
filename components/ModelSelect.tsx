@@ -73,7 +73,7 @@ export function ModelSelect({
       )}
     >
       <CardContent className="pt-6 h-full">
-        <div className="flex items-center justify-between gap-2 mb-4">
+        {/* <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2 w-full transition-opacity duration-200">
             <div className="bg-primary p-2 rounded-full">
               <Link
@@ -139,7 +139,7 @@ export function ModelSelect({
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <ImageDisplay
           modelId={modelId}
