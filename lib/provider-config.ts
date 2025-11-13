@@ -1,15 +1,19 @@
-export type ProviderKey = "replicate" | "vertex" | "openai" | "fireworks";
+export type ProviderKey =
+  // | "replicate"
+  // | "vertex"
+  // | "fireworks"
+  "openai" | "gemini";
+
+interface ProviderConfig {
+  displayName: string;
+  iconPath: string;
+  color: string;
+  models: string[];
+}
+
 export type ModelMode = "performance" | "quality";
 
-export const PROVIDERS: Record<
-  ProviderKey,
-  {
-    displayName: string;
-    iconPath: string;
-    color: string;
-    models: string[];
-  }
-> = {
+export const PROVIDERS: Record<ProviderKey, ProviderConfig> = {
   // replicate: {
   //   displayName: "Replicate",
   //   iconPath: "/provider-icons/replicate.svg",
@@ -55,20 +59,31 @@ export const PROVIDERS: Record<
   //     "accounts/fireworks/models/stable-diffusion-xl-1024-v1-0",
   //   ],
   // },
+  gemini: {
+    displayName: "Gemini",
+    iconPath: "/provider-icons/gemini.svg",
+    color: "from-yellow-500 to-amber-500",
+    models: ["gemini-2.5-flash-image"],
+  },
 };
 
-export const MODEL_CONFIGS: Record<ModelMode, Record<ProviderKey, string>> = {
+export const MODEL_CONFIGS: Record<
+  ModelMode,
+  Record<Partial<ProviderKey>, string>
+> = {
   performance: {
     // replicate: "stability-ai/stable-diffusion-3.5-large-turbo",
     // vertex: "imagen-3.0-fast-generate-001",
     openai: "dall-e-2",
     // fireworks: "accounts/fireworks/models/flux-1-schnell-fp8",
+    gemini: "gemini-2.5-flash-image",
   },
   quality: {
     // replicate: "stability-ai/stable-diffusion-3.5-large",
     // vertex: "imagen-3.0-generate-001",
     openai: "dall-e-3",
     // fireworks: "accounts/fireworks/models/flux-1-dev-fp8",
+    gemini: "gemini-2.5-flash-image",
   },
 };
 
@@ -77,6 +92,7 @@ export const PROVIDER_ORDER: ProviderKey[] = [
   // "vertex",
   "openai",
   // "fireworks",
+  "gemini",
 ];
 
 export const initializeProviderRecord = <T>(defaultValue?: T) =>

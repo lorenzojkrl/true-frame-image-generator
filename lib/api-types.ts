@@ -4,6 +4,7 @@ export interface GenerateImageRequest {
   prompt: string;
   provider: ProviderKey;
   modelId: string;
+  referenceImage?: string;
 }
 
 export interface GenerateImageResponse {

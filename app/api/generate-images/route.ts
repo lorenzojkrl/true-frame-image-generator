@@ -6,6 +6,7 @@ import { replicate } from "@ai-sdk/replicate";
 import { vertex } from "@ai-sdk/google-vertex/edge";
 import { ProviderKey } from "@/lib/provider-config";
 import { GenerateImageRequest } from "@/lib/api-types";
+import { generateImageDirect as generateGeminiImage } from "@/lib/providers/gemini";
 
 /**
  * Intended to be slightly less than the maximum execution time allowed by the
@@ -26,16 +27,20 @@ const providerConfig: Record<ProviderKey, ProviderConfig> = {
     createImageModel: openai.image,
     dimensionFormat: "size",
   },
-  fireworks: {
-    createImageModel: fireworks.image,
-    dimensionFormat: "aspectRatio",
-  },
-  replicate: {
-    createImageModel: replicate.image,
-    dimensionFormat: "size",
-  },
-  vertex: {
-    createImageModel: vertex.image,
+  // fireworks: {
+  //   createImageModel: fireworks.image,
+  //   dimensionFormat: "aspectRatio",
+  // },
+  // replicate: {
+  //   createImageModel: replicate.image,
+  //   dimensionFormat: "size",
+  // },
+  // vertex: {
+  //   createImageModel: vertex.image,
+  //   dimensionFormat: "aspectRatio",
+  // },
+  gemini: {
+    createImageModel: openai.image, // TODO: Replace with Gemini image model Vercel AI SDK has not yet supported
     dimensionFormat: "aspectRatio",
   },
 };
@@ -54,7 +59,7 @@ const withTimeout = <T>(
 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  const { prompt, provider, modelId } =
+  const { prompt, provider, modelId, referenceImage } =
     (await req.json()) as GenerateImageRequest;
 
   try {
@@ -62,6 +67,48 @@ export async function POST(req: NextRequest) {
       const error = "Invalid request parameters";
       console.error(`${error} [requestId=${requestId}]`);
       return NextResponse.json({ error }, { status: 400 });
+    }
+
+    // Handle Gemini separately with direct API
+    if (provider === "gemini") {
+      const startstamp = performance.now();
+      try {
+        const result = await withTimeout(
+          generateGeminiImage({
+            prompt,
+            model: modelId,
+            size: DEFAULT_IMAGE_SIZE,
+            referenceImage,
+          }),
+          TIMEOUT_MILLIS
+        );
+
+        console.log(
+          `Completed image request [requestId=${requestId}, provider=${provider}, model=${modelId}, elapsed=${(
+            (performance.now() - startstamp) /
+            1000
+          ).toFixed(1)}s].`
+        );
+
+        return NextResponse.json(
+          {
+            provider,
+            image: result.image,
+          },
+          { status: 200 }
+        );
+      } catch (error) {
+        console.error(
+          `Error generating image [requestId=${requestId}, provider=${provider}, model=${modelId}]: `,
+          error
+        );
+        return NextResponse.json(
+          {
+            error: "Failed to generate image. Please try again later.",
+          },
+          { status: 500 }
+        );
+      }
     }
 
     const config = providerConfig[provider];
@@ -72,6 +119,10 @@ export async function POST(req: NextRequest) {
       ...(config.dimensionFormat === "size"
         ? { size: DEFAULT_IMAGE_SIZE }
         : { aspectRatio: DEFAULT_ASPECT_RATIO }),
+      ...(provider === "openai" &&
+        referenceImage && {
+          image_url: referenceImage,
+        }),
       ...(provider !== "openai" && {
         seed: Math.floor(Math.random() * 1000000),
       }),

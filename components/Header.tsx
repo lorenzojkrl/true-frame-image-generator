@@ -1,5 +1,11 @@
-import Link from "next/link";
-import { Button } from "./ui/button";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+
+interface HeaderProps {
+  className?: string;
+}
 
 const SparklesIcon = ({ size = 18 }) => {
   return (
@@ -28,21 +34,19 @@ const SparklesIcon = ({ size = 18 }) => {
   );
 };
 
-export const Header = () => {
+export const Header = ({ className }: HeaderProps) => {
+  const router = useRouter();
   return (
-    <header className="mb-4 p-4">
+    <header className={cn("p-4", className)}>
       <div className="mx-auto flex">
         <div>
-          <h1 className="text-xl flex items-center sm:text-2xl sm:font-bold antialiased font-semibold">
-            <Link
-              href="https://sdk.vercel.ai"
-              className="flex items-center mr-2 hover:opacity-75"
-              target="_blank"
-            >
-              <SparklesIcon />
-              TrueFrame
-            </Link>
-          </h1>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center mr-2 hover:opacity-75"
+          >
+            <SparklesIcon />
+            TrueFrame
+          </button>
         </div>
       </div>
     </header>

@@ -12,6 +12,7 @@ interface UseImageGenerationReturn {
     prompt: string,
     providers: ProviderKey[],
     providerToModel: Record<ProviderKey, string>,
+    contextImage?: string
   ) => Promise<void>;
   resetState: () => void;
   activePrompt: string;
@@ -21,7 +22,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
   const [images, setImages] = useState<ImageResult[]>([]);
   const [errors, setErrors] = useState<ImageError[]>([]);
   const [timings, setTimings] = useState<Record<ProviderKey, ProviderTiming>>(
-    initializeProviderRecord<ProviderTiming>(),
+    initializeProviderRecord<ProviderTiming>()
   );
   const [failedProviders, setFailedProviders] = useState<ProviderKey[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +40,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
     prompt: string,
     providers: ProviderKey[],
     providerToModel: Record<ProviderKey, string>,
+    contextImage?: string
   ) => {
     setActivePrompt(prompt);
     try {
@@ -49,7 +51,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
           provider,
           image: null,
           modelId: providerToModel[provider],
-        })),
+        }))
       );
 
       // Clear previous state
@@ -60,23 +62,32 @@ export function useImageGeneration(): UseImageGenerationReturn {
       const now = Date.now();
       setTimings(
         Object.fromEntries(
-          providers.map((provider) => [provider, { startTime: now }]),
-        ) as Record<ProviderKey, ProviderTiming>,
+          providers.map((provider) => [provider, { startTime: now }])
+        ) as Record<ProviderKey, ProviderTiming>
       );
 
       // Helper to fetch a single provider
       const generateImage = async (provider: ProviderKey, modelId: string) => {
+        if (!modelId) {
+          console.warn(
+            `Skipping generation for ${provider}: no modelId provided`
+          );
+          setFailedProviders((prev) => [...prev, provider]);
+          return;
+        }
         const startTime = now;
         console.log(
-          `Generate image request [provider=${provider}, modelId=${modelId}]`,
+          `Generate image request [provider=${provider}, modelId=${modelId}]`
         );
         try {
           const request = {
             prompt,
             provider,
             modelId,
+            ...(contextImage && { contextImage }),
           };
 
+          console.log("request body", request);
           const response = await fetch("/api/generate-images", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -99,7 +110,7 @@ export function useImageGeneration(): UseImageGenerationReturn {
           }));
 
           console.log(
-            `Successful image response [provider=${provider}, modelId=${modelId}, elapsed=${elapsed}ms]`,
+            `Successful image response [provider=${provider}, modelId=${modelId}, elapsed=${elapsed}ms]`
           );
 
           // Update image in state
@@ -107,13 +118,13 @@ export function useImageGeneration(): UseImageGenerationReturn {
             prevImages.map((item) =>
               item.provider === provider
                 ? { ...item, image: data.image ?? null, modelId }
-                : item,
-            ),
+                : item
+            )
           );
         } catch (err) {
           console.error(
             `Error [provider=${provider}, modelId=${modelId}]:`,
-            err,
+            err
           );
           setFailedProviders((prev) => [...prev, provider]);
           setErrors((prev) => [
@@ -131,8 +142,8 @@ export function useImageGeneration(): UseImageGenerationReturn {
             prevImages.map((item) =>
               item.provider === provider
                 ? { ...item, image: null, modelId }
-                : item,
-            ),
+                : item
+            )
           );
         }
       };

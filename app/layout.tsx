@@ -16,9 +16,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "True Frame",
+  title: "TrueFrame",
   description:
-    "True Frame is a platform for creating images for business content.",
+    "TrueFrame is a platform for creating images for business content.",
 };
 
 export default function RootLayout({
@@ -27,10 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="font-sans antialiased">
-        <Header />
-        {children}
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      style={{ height: "100%" }}
+    >
+      <body
+        className="font-sans antialiased flex flex-col h-full"
+        style={{ overflow: "hidden" }}
+      >
+        <Header className="sticky top-0 z-50 bg-background" />
+        <main className="flex-grow overflow-hidden">{children}</main>
         <Analytics />
       </body>
     </html>
