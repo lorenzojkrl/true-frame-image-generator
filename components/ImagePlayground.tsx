@@ -1,36 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { ModelSelect } from "@/components/ModelSelect";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { PromptInput } from "@/components/PromptInput";
-import { ModelCardCarousel } from "@/components/ModelCardCarousel";
+import { PromptSuggestions } from "@/components/PromptSuggestions";
 import {
   MODEL_CONFIGS,
-  PROVIDERS,
   PROVIDER_ORDER,
   ProviderKey,
   ModelMode,
   initializeProviderRecord,
 } from "@/lib/provider-config";
 import { Suggestion } from "@/lib/suggestions";
-import { useImageGeneration } from "@/hooks/use-image-generation";
-import { Header } from "./Header";
 
 export function ImagePlayground({
-  suggestions,
+  suggestions: initialSuggestions,
 }: {
   suggestions: Suggestion[];
 }) {
-  const {
-    images,
-    timings,
-    failedProviders,
-    isLoading,
-    startGeneration,
-    activePrompt,
-  } = useImageGeneration();
-
-  const [showProviders, setShowProviders] = useState(true);
+  const router = useRouter();
   const [selectedModels, setSelectedModels] = useState<
     Record<ProviderKey, string>
   >(MODEL_CONFIGS.performance);
@@ -38,106 +26,70 @@ export function ImagePlayground({
     initializeProviderRecord(true)
   );
   const [mode, setMode] = useState<ModelMode>("performance");
-  const toggleView = () => {
-    setShowProviders((prev) => !prev);
-  };
+  const [activeProvider, setActiveProvider] = useState<ProviderKey>("openai");
+  const [suggestions, setSuggestions] =
+    useState<Suggestion[]>(initialSuggestions);
 
-  const handleModeChange = (newMode: ModelMode) => {
-    setMode(newMode);
-    setSelectedModels(MODEL_CONFIGS[newMode]);
-    setShowProviders(true);
-  };
+  // Populate suggestions on client if not provided
+  useEffect(() => {
+    if (initialSuggestions.length === 0) {
+      import("@/lib/suggestions").then(({ getRandomSuggestions }) => {
+        setSuggestions(getRandomSuggestions());
+      });
+    }
+  }, [initialSuggestions]);
 
   const handleModelChange = (providerKey: ProviderKey, model: string) => {
     setSelectedModels((prev) => ({ ...prev, [providerKey]: model }));
+    setActiveProvider(providerKey); // Track which provider was selected
   };
 
-  const handleProviderToggle = (provider: string, enabled: boolean) => {
-    setEnabledProviders((prev) => ({
-      ...prev,
-      [provider]: enabled,
-    }));
-  };
+  const handlePromptSubmit = (newPrompt: string, contextImage?: string) => {
+    // Use the tracked active provider (from model selection)
+    const model = selectedModels[activeProvider];
 
-  const providerToModel = {
-    replicate: selectedModels.replicate,
-    vertex: selectedModels.vertex,
-    openai: selectedModels.openai,
-    fireworks: selectedModels.fireworks,
-  };
-
-  const handlePromptSubmit = (newPrompt: string) => {
-    const activeProviders = PROVIDER_ORDER.filter((p) => enabledProviders[p]);
-    if (activeProviders.length > 0) {
-      startGeneration(newPrompt, activeProviders, providerToModel);
+    // Store context image if present
+    if (contextImage) {
+      localStorage.setItem("referenceImage", contextImage);
     }
-    setShowProviders(false);
+
+    // Navigate to generation page with query params
+    const params = new URLSearchParams({
+      prompt: newPrompt,
+      provider: activeProvider,
+      model: model,
+    });
+
+    router.push(`/generate/image?${params.toString()}`);
+  };
+
+  const handleSuggestionSelect = (prompt: string) => {
+    handlePromptSubmit(prompt, undefined);
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <Header />
-        <>
-          {(() => {
-            const getModelProps = () =>
-              (Object.keys(PROVIDERS) as ProviderKey[]).map((key) => {
-                const provider = PROVIDERS[key];
-                const imageItem = images.find((img) => img.provider === key);
-                const imageData = imageItem?.image;
-                const modelId = imageItem?.modelId ?? "N/A";
-                const timing = timings[key];
-
-                return {
-                  label: provider.displayName,
-                  models: provider.models,
-                  value: selectedModels[key],
-                  providerKey: key,
-                  onChange: (model: string, providerKey: ProviderKey) =>
-                    handleModelChange(providerKey, model),
-                  iconPath: provider.iconPath,
-                  color: provider.color,
-                  enabled: enabledProviders[key],
-                  onToggle: (enabled: boolean) =>
-                    handleProviderToggle(key, enabled),
-                  image: imageData,
-                  modelId,
-                  timing,
-                  failed: failedProviders.includes(key),
-                };
-              });
-
-            return (
-              <>
-                {/* <div className="md:hidden">
-                  <ModelCardCarousel models={getModelProps()} />
-                  </div> */}
-                <div className="hidden md:flex justify-center flex-wrap gap-8">
-                  {getModelProps().map((props) => (
-                    <ModelSelect key={props.label} {...props} />
-                  ))}
-                </div>
-                {activePrompt && activePrompt.length > 0 && (
-                  <div className="text-center mt-4 text-muted-foreground">
-                    {activePrompt}
-                  </div>
-                )}
-              </>
-            );
-          })()}
-        </>
-        <PromptInput
-          onSubmit={handlePromptSubmit}
-          isLoading={isLoading}
-          showProviders={showProviders}
-          onToggleProviders={toggleView}
-          mode={mode}
-          onModeChange={handleModeChange}
-          suggestions={suggestions}
-          selectedModels={selectedModels}
-          onModelChange={handleModelChange}
-          enabledProviders={enabledProviders}
-        />
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center w-full">
+          <PromptInput
+            onSubmit={handlePromptSubmit}
+            onSuggestionSelect={handleSuggestionSelect}
+            isLoading={false}
+            showProviders={false}
+            onToggleProviders={() => {}}
+            mode={mode}
+            onModeChange={() => {}}
+            suggestions={suggestions}
+            selectedModels={selectedModels}
+            onModelChange={handleModelChange}
+            enabledProviders={enabledProviders}
+            activeProvider={activeProvider}
+          />
+          <PromptSuggestions
+            suggestions={suggestions}
+            onSelect={handleSuggestionSelect}
+          />
+        </div>
       </div>
     </div>
   );

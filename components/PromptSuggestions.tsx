@@ -1,43 +1,37 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Lightbulb } from "lucide-react";
 import { Suggestion } from "@/lib/suggestions";
+import { cn } from "@/lib/utils";
+import { ArrowUpRight } from "lucide-react";
 
 interface PromptSuggestionsProps {
   suggestions: Suggestion[];
   onSelect: (prompt: string) => void;
-  disabled?: boolean;
 }
 
 export function PromptSuggestions({
   suggestions,
   onSelect,
-  disabled = false,
 }: PromptSuggestionsProps) {
   return (
-    <div className="relative flex-grow overflow-hidden">
-      <ScrollArea className="w-full whitespace-nowrap rounded-md">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-2 py-1">
-            {suggestions.map((suggestion) => (
-              <Button
-                key={suggestion.text}
-                variant="secondary"
-                size="sm"
-                className="h-8 shrink-0 gap-1.5"
-                disabled={disabled}
-                onClick={() => onSelect(suggestion.prompt)}
-              >
-                <Lightbulb className="h-3.5 w-3.5 text-muted-foreground" />
-                {suggestion.text}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <ScrollBar orientation="horizontal" className="h-2.5" />
-      </ScrollArea>
+    <div className="flex items-center justify-between space-x-2 mt-4">
+      {suggestions.map((suggestion, index) => (
+        <button
+          key={index}
+          onClick={() => onSelect(suggestion.prompt)}
+          className={cn(
+            "flex items-center justify-between px-2 rounded-lg py-1 bg-background text-sm hover:opacity-70 group transition-opacity duration-200",
+            index > 2 ? "hidden md:flex" : index > 1 ? "hidden sm:flex" : ""
+          )}
+        >
+          <span>
+            <span className="text-black text-xs sm:text-sm">
+              {suggestion.text.toLowerCase()}
+            </span>
+          </span>
+          <ArrowUpRight className="ml-1 h-2 w-2 sm:h-3 sm:w-3 text-zinc-500 group-hover:opacity-70" />
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { ArrowUpRight, ArrowUp, RefreshCw } from "lucide-react";
-import { getRandomSuggestions, Suggestion } from "@/lib/suggestions";
+"use client";
+
+import { useState, useRef } from "react";
+import { ArrowUp, Image as ImageIcon, X } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -11,132 +11,199 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectLabel,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PROVIDERS, ProviderKey, PROVIDER_ORDER } from "@/lib/provider-config";
 import { imageHelpers } from "@/lib/image-helpers";
 
 type QualityMode = "performance" | "quality";
 
 interface PromptInputProps {
-  onSubmit: (prompt: string) => void;
+  onSubmit: (prompt: string, contextImage?: string) => void;
+  onSuggestionSelect: (prompt: string) => void;
   isLoading?: boolean;
   showProviders: boolean;
   onToggleProviders: () => void;
   mode: QualityMode;
   onModeChange: (mode: QualityMode) => void;
-  suggestions: Suggestion[];
+  suggestions: Array<{ prompt: string; text: string }>;
   selectedModels: Record<ProviderKey, string>;
   onModelChange: (providerKey: ProviderKey, model: string) => void;
   enabledProviders: Record<ProviderKey, boolean>;
+  showModelSelector?: boolean;
+  activeProvider?: ProviderKey;
 }
 
 export function PromptInput({
-  suggestions: initSuggestions,
   isLoading,
   onSubmit,
+  onSuggestionSelect,
+  suggestions,
   selectedModels,
   onModelChange,
   enabledProviders,
+  showModelSelector = true,
+  activeProvider,
 }: PromptInputProps) {
   const [input, setInput] = useState("");
-  const [suggestions, setSuggestions] = useState<Suggestion[]>(initSuggestions);
-
-  const updateSuggestions = () => {
-    setSuggestions(getRandomSuggestions());
-  };
-  const handleSuggestionSelect = (prompt: string) => {
-    setInput(prompt);
-    onSubmit(prompt);
-  };
+  const [contextImage, setContextImage] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     if (!isLoading && input.trim()) {
-      onSubmit(input);
+      onSubmit(input, contextImage || undefined);
+      setInput("");
+      setContextImage(null);
     }
   };
 
-  // const handleRefreshSuggestions = () => {
-  //   setCurrentSuggestions(getRandomSuggestions());
-  // };
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setContextImage(reader.result as string);
+        setIsDialogOpen(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setContextImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (!isLoading && input.trim()) {
-        onSubmit(input);
+        onSubmit(input, contextImage || undefined);
       }
     }
   };
 
   return (
-    <div className="w-full mb-8">
+    <div className="w-full mb-8 max-w-[750px] mx-auto">
       <div className="bg-zinc-50 rounded-xl p-4">
         <div className="flex flex-col gap-3">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Enter your prompt here"
+            placeholder="Create with TrueFrame..."
             rows={3}
             className="text-base bg-transparent border-none p-0 resize-none placeholder:text-zinc-500 text-[#111111] focus-visible:ring-0 focus-visible:ring-offset-0"
           />
+          {contextImage && (
+            <div className="relative inline-block">
+              <img
+                src={contextImage}
+                alt="Context"
+                className="h-16 w-16 object-cover rounded-lg border border-zinc-200"
+              />
+              <button
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 bg-black rounded-full p-1 hover:bg-zinc-800"
+              >
+                <X className="w-3 h-3 text-white" />
+              </button>
+            </div>
+          )}
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center justify-between space-x-2">
-              {/* <button
-                onClick={updateSuggestions}
-                className="flex items-center justify-between px-2 rounded-lg py-1 bg-background text-sm hover:opacity-70 group transition-opacity duration-200"
-              >
-                <RefreshCw className="w-4 h-4 text-zinc-500 group-hover:opacity-70" />
-              </button> */}
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionSelect(suggestion.prompt)}
-                  className={cn(
-                    "flex items-center justify-between px-2 rounded-lg py-1 bg-background text-sm hover:opacity-70 group transition-opacity duration-200",
-                    index > 2
-                      ? "hidden md:flex"
-                      : index > 1
-                      ? "hidden sm:flex"
-                      : ""
-                  )}
-                >
-                  <span>
-                    <span className="text-black text-xs sm:text-sm">
-                      {suggestion.text.toLowerCase()}
-                    </span>
-                  </span>
-                  <ArrowUpRight className="ml-1 h-2 w-2 sm:h-3 sm:w-3 text-zinc-500 group-hover:opacity-70" />
-                </button>
-              ))}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <button className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-zinc-200 transition-colors duration-200">
+                    <ImageIcon className="w-5 h-5 text-zinc-600" />
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Upload Context Image</DialogTitle>
+                    <DialogDescription>
+                      Upload an image to use as context for image generation.
+                      This can help guide the AI to create images similar to
+                      your reference.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-300 rounded-lg p-8 hover:border-zinc-400 transition-colors">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer flex flex-col items-center"
+                      >
+                        <ImageIcon className="w-12 h-12 text-zinc-400 mb-2" />
+                        <span className="text-sm text-zinc-600 mb-1">
+                          Click to upload an image
+                        </span>
+                        <span className="text-xs text-zinc-400">
+                          PNG, JPG, GIF up to 10MB
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="flex items-center gap-2">
-              {PROVIDER_ORDER.filter((key) => enabledProviders[key]).map(
-                (providerKey) => {
-                  const provider = PROVIDERS[providerKey];
-                  return (
-                    <Select
-                      key={providerKey}
-                      value={selectedModels[providerKey]}
-                      onValueChange={(model) =>
-                        onModelChange(providerKey, model)
+              {showModelSelector && (
+                <Select
+                  value={
+                    activeProvider
+                      ? selectedModels[activeProvider]
+                      : Object.values(selectedModels)[0]
+                  }
+                  onValueChange={(model) => {
+                    // Update logic for single model selection
+                    const providerKey = Object.keys(PROVIDERS).find((key) =>
+                      PROVIDERS[key as ProviderKey].models.includes(model)
+                    ) as ProviderKey;
+                    if (providerKey) {
+                      onModelChange(providerKey, model);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-8 w-[180px] text-xs">
+                    <SelectValue placeholder="Select model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROVIDER_ORDER.filter((key) => enabledProviders[key]).map(
+                      (providerKey) => {
+                        const provider = PROVIDERS[providerKey];
+                        return (
+                          <SelectGroup key={providerKey}>
+                            <SelectLabel>{provider.displayName}</SelectLabel>
+                            {provider.models.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {imageHelpers.formatModelId(model)}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        );
                       }
-                    >
-                      <SelectTrigger className="h-8 w-[140px] text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {provider.models.map((model) => (
-                            <SelectItem key={model} value={model}>
-                              {imageHelpers.formatModelId(model)}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  );
-                }
+                    )}
+                  </SelectContent>
+                </Select>
               )}
               <button
                 onClick={handleSubmit}
