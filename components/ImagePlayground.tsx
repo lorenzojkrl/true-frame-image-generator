@@ -73,13 +73,11 @@ export function ImagePlayground({
         <div className="flex flex-col items-center justify-center w-full">
           <PromptInput
             onSubmit={handlePromptSubmit}
-            onSuggestionSelect={handleSuggestionSelect}
             isLoading={false}
             showProviders={false}
             onToggleProviders={() => {}}
             mode={mode}
             onModeChange={() => {}}
-            suggestions={suggestions}
             selectedModels={selectedModels}
             onModelChange={handleModelChange}
             enabledProviders={enabledProviders}

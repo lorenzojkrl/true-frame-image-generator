@@ -32,7 +32,8 @@ export function useSingleGeneration() {
       provider: ProviderKey,
       model: string,
       aspectRatio?: string,
-      referenceImage?: string | null
+      referenceImage?: string | null,
+      editingImage?: string | null
     ) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -46,6 +47,7 @@ export function useSingleGeneration() {
             modelId: model,
             aspectRatio,
             referenceImage,
+            editingImage,
           }),
         });
 

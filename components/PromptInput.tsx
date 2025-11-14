@@ -28,30 +28,28 @@ type QualityMode = "performance" | "quality";
 
 interface PromptInputProps {
   onSubmit: (prompt: string, contextImage?: string) => void;
-  onSuggestionSelect: (prompt: string) => void;
   isLoading?: boolean;
   showProviders: boolean;
   onToggleProviders: () => void;
   mode: QualityMode;
   onModeChange: (mode: QualityMode) => void;
-  suggestions: Array<{ prompt: string; text: string }>;
   selectedModels: Record<ProviderKey, string>;
   onModelChange: (providerKey: ProviderKey, model: string) => void;
   enabledProviders: Record<ProviderKey, boolean>;
   showModelSelector?: boolean;
   activeProvider?: ProviderKey;
+  editingImage?: string | null;
 }
 
 export function PromptInput({
   isLoading,
   onSubmit,
-  onSuggestionSelect,
-  suggestions,
   selectedModels,
   onModelChange,
   enabledProviders,
   showModelSelector = true,
   activeProvider,
+  editingImage,
 }: PromptInputProps) {
   const [input, setInput] = useState("");
   const [contextImage, setContextImage] = useState<string | null>(null);
@@ -102,7 +100,11 @@ export function PromptInput({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Create with TrueFrame..."
+            placeholder={
+              editingImage
+                ? "Describe changes to the current image..."
+                : "Create with TrueFrame..."
+            }
             rows={3}
             className="text-base bg-transparent border-none p-0 resize-none placeholder:text-zinc-500 text-[#111111] focus-visible:ring-0 focus-visible:ring-offset-0"
           />

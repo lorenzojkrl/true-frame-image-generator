@@ -68,12 +68,16 @@ export default function GenerateImagePage() {
   ]);
 
   const handlePromptSubmit = (prompt: string) => {
+    // Use currentImage as the base for editing if it exists
+    const imageToEdit = currentImage?.image || null;
+
     generateImage(
       prompt,
       selectedProvider,
       selectedModel,
       aspectRatio,
-      referenceImage
+      referenceImage,
+      imageToEdit
     );
   };
 
@@ -137,13 +141,11 @@ export default function GenerateImagePage() {
             <div className="max-w-4xl mx-auto px-6 py-4">
               <PromptInput
                 onSubmit={handlePromptSubmit}
-                onSuggestionSelect={handleSuggestionSelect}
                 isLoading={isLoading}
                 showProviders={false}
                 onToggleProviders={() => {}}
                 mode="performance"
                 onModeChange={() => {}}
-                suggestions={suggestions}
                 selectedModels={
                   { [selectedProvider]: selectedModel } as Record<
                     ProviderKey,
@@ -155,6 +157,8 @@ export default function GenerateImagePage() {
                   { [selectedProvider]: true } as Record<ProviderKey, boolean>
                 }
                 showModelSelector={false}
+                editingImage={currentImage?.image || null}
+                activeProvider={selectedProvider}
               />
             </div>
           </div>

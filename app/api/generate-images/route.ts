@@ -59,7 +59,7 @@ const withTimeout = <T>(
 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  const { prompt, provider, modelId, referenceImage } =
+  const { prompt, provider, modelId, referenceImage, editingImage } =
     (await req.json()) as GenerateImageRequest;
 
   try {
@@ -73,12 +73,15 @@ export async function POST(req: NextRequest) {
     if (provider === "gemini") {
       const startstamp = performance.now();
       try {
+        // Prioritize editingImage over referenceImage
+        const imageToUse = editingImage || referenceImage;
+
         const result = await withTimeout(
           generateGeminiImage({
             prompt,
             model: modelId,
             size: DEFAULT_IMAGE_SIZE,
-            referenceImage,
+            referenceImage: imageToUse,
           }),
           TIMEOUT_MILLIS
         );
@@ -113,6 +116,10 @@ export async function POST(req: NextRequest) {
 
     const config = providerConfig[provider];
     const startstamp = performance.now();
+
+    // Prioritize editingImage over referenceImage for all providers
+    const imageToUse = editingImage || referenceImage;
+
     const generatePromise = generateImage({
       model: config.createImageModel(modelId),
       prompt,
@@ -120,8 +127,8 @@ export async function POST(req: NextRequest) {
         ? { size: DEFAULT_IMAGE_SIZE }
         : { aspectRatio: DEFAULT_ASPECT_RATIO }),
       ...(provider === "openai" &&
-        referenceImage && {
-          image_url: referenceImage,
+        imageToUse && {
+          image_url: imageToUse,
         }),
       ...(provider !== "openai" && {
         seed: Math.floor(Math.random() * 1000000),

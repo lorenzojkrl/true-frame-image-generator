@@ -4,7 +4,8 @@ export interface GenerateImageRequest {
   prompt: string;
   provider: ProviderKey;
   modelId: string;
-  referenceImage?: string;
+  referenceImage?: string; // For style transfer
+  editingImage?: string; // For editing the current image
 }
 
 export interface GenerateImageResponse {

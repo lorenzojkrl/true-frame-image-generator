@@ -52,6 +52,15 @@ export async function generateImageDirect({
           data: base64Data,
         },
       });
+    } else {
+      // If it's already just base64 data without the data URL prefix,
+      // assume it's PNG and use it directly
+      parts.push({
+        inlineData: {
+          mimeType: "image/png",
+          data: referenceImage,
+        },
+      });
     }
   }
 
@@ -85,7 +94,7 @@ export async function generateImageDirect({
         const base64Data = inlineData.data || "";
 
         return {
-          image: base64Data,
+          image: base64Data, // Return just base64, not the full data URL
         };
       }
     }
