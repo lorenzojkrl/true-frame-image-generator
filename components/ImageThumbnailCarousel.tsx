@@ -23,7 +23,7 @@ export function ImageThumbnailCarousel({
   selectedImageId,
   onImageSelect,
 }: ImageThumbnailCarouselProps) {
-  if (images.length === 0) return null;
+  // if (images.length === 0) return null;
 
   const handleActionClick = (
     e: React.MouseEvent,
@@ -37,7 +37,7 @@ export function ImageThumbnailCarousel({
   };
 
   return (
-    <div className="w-full bg-zinc-900 border-t border-zinc-800 p-4">
+    <div className="bg-zinc-950 px-4">
       <div className="flex gap-3 overflow-x-auto">
         {images.map((img) => (
           <div
@@ -46,8 +46,8 @@ export function ImageThumbnailCarousel({
             className={cn(
               "relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden cursor-pointer transition-all group",
               selectedImageId === img.id
-                ? "ring-2 ring-blue-500"
-                : "ring-1 ring-zinc-700 hover:ring-zinc-600"
+                ? "border-2 border-blue-500"
+                : "border-1 border-zinc-700 hover:border-zinc-600"
             )}
           >
             <img
@@ -69,6 +69,11 @@ export function ImageThumbnailCarousel({
             </button>
           </div>
         ))}
+        {images.length === 0 && (
+          <div className="flex-1 flex items-center justify-center h-24">
+            <p className="text-zinc-500 text-sm">No images generated yet</p>
+          </div>
+        )}
       </div>
     </div>
   );

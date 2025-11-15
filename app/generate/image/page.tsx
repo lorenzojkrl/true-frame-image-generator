@@ -134,10 +134,7 @@ export default function GenerateImagePage() {
           />
 
           {/* Fixed Input at Bottom */}
-          <div
-            className="border-t border-zinc-800 bg-zinc-900"
-            id="prompt-input"
-          >
+          <div className="bg-zinc-950" id="prompt-input">
             <div className="max-w-4xl mx-auto px-6 py-4">
               <PromptInput
                 onSubmit={handlePromptSubmit}

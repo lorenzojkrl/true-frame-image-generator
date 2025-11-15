@@ -33,7 +33,7 @@ export function GenerationCanvas({
           <img
             src={`data:image/png;base64,${image}`}
             alt="Generated"
-            className="max-w-full max-h-[calc(100vh-300px)] object-contain rounded-lg"
+            className="max-w-full max-h-[calc(100vh-500px)] object-contain rounded-lg"
           />
           <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
