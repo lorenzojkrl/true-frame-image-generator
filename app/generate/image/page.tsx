@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { GenerationSidebar } from "@/components/GenerationSidebar";
 import { GenerationCanvas } from "@/components/GenerationCanvas";
@@ -8,13 +8,12 @@ import { ImageThumbnailCarousel } from "@/components/ImageThumbnailCarousel";
 import { PromptInput } from "@/components/PromptInput";
 import { useSingleGeneration } from "@/hooks/use-single-generation";
 import { ProviderKey, MODEL_CONFIGS } from "@/lib/provider-config";
-import { getRandomSuggestions } from "@/lib/suggestions";
 
 export default function GenerateImagePage() {
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get("prompt");
   const initialProvider = (searchParams.get("provider") ||
-    "openai") as ProviderKey;
+    "gemini") as ProviderKey;
   const initialModel =
     searchParams.get("model") || MODEL_CONFIGS.performance[initialProvider];
 
@@ -23,7 +22,7 @@ export default function GenerateImagePage() {
   const [selectedModel, setSelectedModel] = useState(initialModel);
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
-  const [hasInitialGeneration, setHasInitialGeneration] = useState(false);
+  const hasInitialGenerationRef = useRef(false);
 
   const {
     currentImage,
@@ -34,36 +33,37 @@ export default function GenerateImagePage() {
     selectImage,
   } = useSingleGeneration();
 
-  const suggestions = getRandomSuggestions();
-
-  // Load reference image from localStorage on mount
+  // Load reference image and auto-generate if prompt exists
   useEffect(() => {
-    const storedImage = localStorage.getItem("referenceImage");
-    if (storedImage) {
-      setReferenceImage(storedImage);
-      localStorage.removeItem("referenceImage");
-    }
-  }, []);
+    if (!hasInitialGenerationRef.current) {
+      hasInitialGenerationRef.current = true;
 
-  // Auto-generate on mount if prompt exists
-  useEffect(() => {
-    if (initialPrompt && !hasInitialGeneration) {
-      setHasInitialGeneration(true);
-      generateImage(
-        initialPrompt,
-        selectedProvider,
-        selectedModel,
-        aspectRatio,
-        referenceImage
-      );
+      // First: Load reference image from localStorage
+      const storedImage = localStorage.getItem("referenceImage");
+      let imageToUse: string | null = null;
+
+      if (storedImage) {
+        setReferenceImage(storedImage);
+        localStorage.removeItem("referenceImage");
+        imageToUse = storedImage;
+      }
+
+      // Second: Generate image with the loaded reference image
+      if (initialPrompt) {
+        generateImage(
+          initialPrompt,
+          selectedProvider,
+          selectedModel,
+          aspectRatio,
+          imageToUse
+        );
+      }
     }
   }, [
     initialPrompt,
-    hasInitialGeneration,
     selectedProvider,
     selectedModel,
     aspectRatio,
-    referenceImage,
     generateImage,
   ]);
 
@@ -78,16 +78,6 @@ export default function GenerateImagePage() {
       aspectRatio,
       referenceImage,
       imageToEdit
-    );
-  };
-
-  const handleSuggestionSelect = (prompt: string) => {
-    generateImage(
-      prompt,
-      selectedProvider,
-      selectedModel,
-      aspectRatio,
-      referenceImage
     );
   };
 
@@ -141,8 +131,6 @@ export default function GenerateImagePage() {
                 isLoading={isLoading}
                 showProviders={false}
                 onToggleProviders={() => {}}
-                mode="performance"
-                onModeChange={() => {}}
                 selectedModels={
                   { [selectedProvider]: selectedModel } as Record<
                     ProviderKey,
