@@ -7,15 +7,14 @@ import { GenerationCanvas } from "@/components/GenerationCanvas";
 import { ImageThumbnailCarousel } from "@/components/ImageThumbnailCarousel";
 import { PromptInput } from "@/components/PromptInput";
 import { useSingleGeneration } from "@/hooks/use-single-generation";
-import { ProviderKey, MODEL_CONFIGS } from "@/lib/provider-config";
+import { ProviderKey, DEFAULT_MODEL } from "@/lib/provider-config";
 
 export default function GenerateImagePage() {
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get("prompt");
   const initialProvider = (searchParams.get("provider") ||
     "gemini") as ProviderKey;
-  const initialModel =
-    searchParams.get("model") || MODEL_CONFIGS.performance[initialProvider];
+  const initialModel = searchParams.get("model") || DEFAULT_MODEL;
 
   const [selectedProvider, setSelectedProvider] =
     useState<ProviderKey>(initialProvider);
@@ -83,9 +82,6 @@ export default function GenerateImagePage() {
 
   const handleProviderChange = (provider: ProviderKey) => {
     setSelectedProvider(provider);
-    // Update model to the first model of the new provider
-    const providerConfig = MODEL_CONFIGS.performance;
-    setSelectedModel(providerConfig[provider]);
   };
 
   const handleModelChange = (model: string) => {
@@ -131,12 +127,7 @@ export default function GenerateImagePage() {
                 isLoading={isLoading}
                 showProviders={false}
                 onToggleProviders={() => {}}
-                selectedModels={
-                  { [selectedProvider]: selectedModel } as Record<
-                    ProviderKey,
-                    string
-                  >
-                }
+                selectedModel={selectedModel}
                 onModelChange={(_, model) => handleModelChange(model)}
                 enabledProviders={
                   { [selectedProvider]: true } as Record<ProviderKey, boolean>

@@ -18,7 +18,6 @@ interface ModelCardCarouselProps {
   models: Array<{
     label: string;
     models: string[];
-    iconPath: string;
     color: string;
     value: string;
     providerKey: ProviderKey;
@@ -71,7 +70,7 @@ export function ModelCardCarousel({ models }: ModelCardCarouselProps) {
           align: "start",
           dragFree: false,
           containScroll: "trimSnaps",
-          loop: true
+          loop: true,
         }}
       >
         <CarouselContent>
@@ -104,7 +103,7 @@ export function ModelCardCarousel({ models }: ModelCardCarouselProps) {
                 "h-1.5 rounded-full transition-all",
                 index === currentSlide
                   ? "w-4 bg-primary"
-                  : "w-1.5 bg-primary/50",
+                  : "w-1.5 bg-primary/50"
               )}
               onClick={() => api?.scrollTo(index)}
             >

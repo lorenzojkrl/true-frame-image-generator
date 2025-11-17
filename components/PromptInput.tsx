@@ -7,11 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectLabel,
 } from "@/components/ui/select";
 import {
   Dialog,
@@ -21,19 +19,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PROVIDERS, ProviderKey, PROVIDER_ORDER } from "@/lib/provider-config";
+import { PROVIDERS, ProviderKey, ALL_MODELS } from "@/lib/provider-config";
 import { imageHelpers } from "@/lib/image-helpers";
-
-type QualityMode = "performance" | "quality";
 
 interface PromptInputProps {
   onSubmit: (prompt: string, contextImage?: string) => void;
   isLoading?: boolean;
   showProviders: boolean;
   onToggleProviders: () => void;
-  mode: QualityMode;
-  onModeChange: (mode: QualityMode) => void;
-  selectedModels: Record<ProviderKey, string>;
+  selectedModel?: string;
   onModelChange: (providerKey: ProviderKey, model: string) => void;
   enabledProviders: Record<ProviderKey, boolean>;
   showModelSelector?: boolean;
@@ -44,7 +38,7 @@ interface PromptInputProps {
 export function PromptInput({
   isLoading,
   onSubmit,
-  selectedModels,
+  selectedModel,
   onModelChange,
   enabledProviders,
   showModelSelector = true,
@@ -170,11 +164,7 @@ export function PromptInput({
             <div className="flex items-center gap-2">
               {showModelSelector && (
                 <Select
-                  value={
-                    activeProvider
-                      ? selectedModels[activeProvider]
-                      : Object.values(selectedModels)[0]
-                  }
+                  value={selectedModel}
                   onValueChange={(model) => {
                     // Update logic for single model selection
                     const providerKey = Object.keys(PROVIDERS).find((key) =>
@@ -189,21 +179,11 @@ export function PromptInput({
                     <SelectValue placeholder="Select model" />
                   </SelectTrigger>
                   <SelectContent>
-                    {PROVIDER_ORDER.filter((key) => enabledProviders[key]).map(
-                      (providerKey) => {
-                        const provider = PROVIDERS[providerKey];
-                        return (
-                          <SelectGroup key={providerKey}>
-                            <SelectLabel>{provider.displayName}</SelectLabel>
-                            {provider.models.map((model) => (
-                              <SelectItem key={model} value={model}>
-                                {imageHelpers.formatModelId(model)}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        );
-                      }
-                    )}
+                    {ALL_MODELS.map((modelConfig) => (
+                      <SelectItem key={modelConfig.id} value={modelConfig.id}>
+                        {imageHelpers.formatModelId(modelConfig.id)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               )}

@@ -19,7 +19,6 @@ interface ModelSelectProps {
   value: string;
   providerKey: ProviderKey;
   onChange: (value: string, providerKey: ProviderKey) => void;
-  iconPath: string;
   color: string;
   enabled?: boolean;
   onToggle?: (enabled: boolean) => void;

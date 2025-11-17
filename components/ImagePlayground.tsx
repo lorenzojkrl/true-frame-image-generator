@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { PromptInput } from "@/components/PromptInput";
 import { PromptSuggestions } from "@/components/PromptSuggestions";
 import {
-  MODEL_CONFIGS,
-  PROVIDER_ORDER,
   ProviderKey,
-  ModelMode,
   initializeProviderRecord,
+  DEFAULT_MODEL,
+  ALL_MODELS,
 } from "@/lib/provider-config";
 import { Suggestion } from "@/lib/suggestions";
 
@@ -19,14 +18,11 @@ export function ImagePlayground({
   suggestions: Suggestion[];
 }) {
   const router = useRouter();
-  const [selectedModels, setSelectedModels] = useState<
-    Record<ProviderKey, string>
-  >(MODEL_CONFIGS.performance);
+  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
   const [enabledProviders, setEnabledProviders] = useState(
     initializeProviderRecord(true)
   );
-  const [mode, setMode] = useState<ModelMode>("performance");
-  const [activeProvider, setActiveProvider] = useState<ProviderKey>("openai");
+  const [activeProvider, setActiveProvider] = useState<ProviderKey>("gemini");
   const [suggestions, setSuggestions] =
     useState<Suggestion[]>(initialSuggestions);
 
@@ -40,13 +36,18 @@ export function ImagePlayground({
   }, [initialSuggestions]);
 
   const handleModelChange = (providerKey: ProviderKey, model: string) => {
-    setSelectedModels((prev) => ({ ...prev, [providerKey]: model }));
-    setActiveProvider(providerKey); // Track which provider was selected
+    setSelectedModel(model);
+    // Find which provider this model belongs to
+    const modelConfig = ALL_MODELS.find((m) => m.id === model);
+    if (modelConfig) {
+      setActiveProvider(modelConfig.provider);
+    }
   };
 
   const handlePromptSubmit = (newPrompt: string, contextImage?: string) => {
-    // Use the tracked active provider (from model selection)
-    const model = selectedModels[activeProvider];
+    // Find the provider for the selected model
+    const modelConfig = ALL_MODELS.find((m) => m.id === selectedModel);
+    const provider = modelConfig?.provider || "gemini";
 
     // Store context image if present
     if (contextImage) {
@@ -56,8 +57,8 @@ export function ImagePlayground({
     // Navigate to generation page with query params
     const params = new URLSearchParams({
       prompt: newPrompt,
-      provider: activeProvider,
-      model: model,
+      provider: provider,
+      model: selectedModel,
     });
 
     router.push(`/generate/image?${params.toString()}`);
@@ -76,9 +77,7 @@ export function ImagePlayground({
             isLoading={false}
             showProviders={false}
             onToggleProviders={() => {}}
-            mode={mode}
-            onModeChange={() => {}}
-            selectedModels={selectedModels}
+            selectedModel={selectedModel}
             onModelChange={handleModelChange}
             enabledProviders={enabledProviders}
             activeProvider={activeProvider}
