@@ -39,13 +39,16 @@ export const Header = ({ className }: HeaderProps) => {
   return (
     <header className={cn("p-4", className)}>
       <div className="mx-auto flex">
-        <div>
+        <div className="flex justify-between w-full">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push("/")}
             className="flex items-center mr-2 hover:opacity-75"
           >
             <SparklesIcon />
             TrueFrame
+          </button>
+          <button onClick={() => router.push("/generate/workflow")}>
+            Workflow
           </button>
         </div>
       </div>

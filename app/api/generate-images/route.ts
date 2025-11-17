@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ImageModel, experimental_generateImage as generateImage } from "ai";
+import { experimental_generateImage as generateImage } from "ai";
+import type { ImageModel } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 import { ProviderKey } from "@/lib/provider-config";
@@ -22,11 +23,15 @@ interface ProviderConfig {
 
 const providerConfig: Record<ProviderKey, ProviderConfig> = {
   openai: {
-    createImageModel: openai.image,
+    createImageModel: (modelId: string) =>
+      // double cast as unknown as ImageModel to bridge the gap between ImageModelV1 and ImageModelV2.
+      // This is a temporary workaround until the OpenAI SDK is updated to return v2 models.
+      openai.image(modelId as any) as unknown as ImageModel,
     dimensionFormat: "size",
   },
   gemini: {
-    createImageModel: openai.image, // TODO: Replace with Gemini image model Vercel AI SDK has not yet supported
+    createImageModel: (modelId: string) =>
+      openai.image(modelId as any) as unknown as ImageModel,
     dimensionFormat: "aspectRatio",
   },
 };
@@ -61,6 +66,16 @@ export async function POST(req: NextRequest) {
       try {
         // Prioritize editingImage over referenceImage
         const imageToUse = editingImage || referenceImage;
+
+        console.log({
+          prompt: prompt.slice(0, 50) + "...",
+          modelId,
+          imageToUse: imageToUse ? imageToUse.slice(0, 50) + "..." : null,
+          referenceImage: referenceImage
+            ? referenceImage.slice(0, 50) + "..."
+            : null,
+          editingImage: editingImage ? editingImage.slice(0, 50) + "..." : null,
+        });
 
         const result = await withTimeout(
           generateGeminiImage({

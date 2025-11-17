@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowUp, Image as ImageIcon, X } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,8 @@ import { imageHelpers } from "@/lib/image-helpers";
 
 interface PromptInputProps {
   onSubmit: (prompt: string, contextImage?: string) => void;
+  prompt?: string;
+  onPromptChange?: (prompt: string) => void;
   isLoading?: boolean;
   showProviders: boolean;
   onToggleProviders: () => void;
@@ -34,6 +36,8 @@ interface PromptInputProps {
 }
 
 export function PromptInput({
+  prompt,
+  onPromptChange,
   isLoading,
   onSubmit,
   selectedModel,
@@ -41,15 +45,22 @@ export function PromptInput({
   showModelSelector = true,
   editingImage,
 }: PromptInputProps) {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(prompt || "");
   const [contextImage, setContextImage] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Sync internal state with external prompt prop
+  useEffect(() => {
+    if (prompt !== undefined) {
+      setInput(prompt);
+    }
+  }, [prompt]);
+
   const handleSubmit = () => {
     if (!isLoading && input.trim()) {
       onSubmit(input, contextImage || undefined);
-      setInput("");
+      setInput(prompt || "");
       setContextImage(null);
     }
   };
@@ -88,7 +99,10 @@ export function PromptInput({
         <div className="flex flex-col gap-3">
           <Textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              onPromptChange?.(e.target.value);
+            }}
             onKeyDown={handleKeyDown}
             placeholder={
               editingImage
