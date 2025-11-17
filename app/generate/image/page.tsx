@@ -129,12 +129,8 @@ export default function GenerateImagePage() {
                 onToggleProviders={() => {}}
                 selectedModel={selectedModel}
                 onModelChange={(_, model) => handleModelChange(model)}
-                enabledProviders={
-                  { [selectedProvider]: true } as Record<ProviderKey, boolean>
-                }
                 showModelSelector={false}
                 editingImage={currentImage?.image || null}
-                activeProvider={selectedProvider}
               />
             </div>
           </div>

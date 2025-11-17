@@ -79,8 +79,6 @@ export function ImagePlayground({
             onToggleProviders={() => {}}
             selectedModel={selectedModel}
             onModelChange={handleModelChange}
-            enabledProviders={enabledProviders}
-            activeProvider={activeProvider}
           />
           <PromptSuggestions
             suggestions={suggestions}

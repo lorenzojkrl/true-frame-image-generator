@@ -1,11 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { imageHelpers } from "@/lib/image-helpers";
-import {
-  FireworksIcon,
-  OpenAIIcon,
-  ReplicateIcon,
-  VertexIcon,
-} from "@/lib/logos";
+import { OpenAIIcon, VertexIcon } from "@/lib/logos";
 import { ProviderKey } from "@/lib/provider-config";
 import { cn } from "@/lib/utils";
 
@@ -14,14 +8,8 @@ import { ProviderTiming } from "@/lib/image-types";
 import { ImageDisplay } from "./ImageDisplay";
 
 interface ModelSelectProps {
-  label: string;
-  models: string[];
-  value: string;
   providerKey: ProviderKey;
-  onChange: (value: string, providerKey: ProviderKey) => void;
-  color: string;
   enabled?: boolean;
-  onToggle?: (enabled: boolean) => void;
   image: string | null | undefined;
   timing?: ProviderTiming;
   failed?: boolean;
@@ -30,34 +18,22 @@ interface ModelSelectProps {
 
 const PROVIDER_ICONS = {
   openai: OpenAIIcon,
-  replicate: ReplicateIcon,
-  vertex: VertexIcon,
-  fireworks: FireworksIcon,
   gemini: VertexIcon,
 } as const;
 
 const PROVIDER_LINKS = {
   openai: "openai",
-  // replicate: "replicate",
-  // vertex: "google-vertex",
-  // fireworks: "fireworks",
   gemini: "gemini",
 } as const;
 
 export function ModelSelect({
-  label,
-  models,
-  value,
   providerKey,
-  onChange,
   enabled = true,
   image,
   timing,
   failed,
   modelId,
 }: ModelSelectProps) {
-  const Icon = PROVIDER_ICONS[providerKey];
-
   return (
     <Card
       className={cn(

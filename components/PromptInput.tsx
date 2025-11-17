@@ -29,9 +29,7 @@ interface PromptInputProps {
   onToggleProviders: () => void;
   selectedModel?: string;
   onModelChange: (providerKey: ProviderKey, model: string) => void;
-  enabledProviders: Record<ProviderKey, boolean>;
   showModelSelector?: boolean;
-  activeProvider?: ProviderKey;
   editingImage?: string | null;
 }
 
@@ -40,9 +38,7 @@ export function PromptInput({
   onSubmit,
   selectedModel,
   onModelChange,
-  enabledProviders,
   showModelSelector = true,
-  activeProvider,
   editingImage,
 }: PromptInputProps) {
   const [input, setInput] = useState("");

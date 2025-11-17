@@ -1,31 +1,3 @@
-
-export const FireworksIcon = ({ size = 16 }) => {
-  return (
-    <svg
-      height={size}
-      width={size}
-      viewBox="0 0 638 315"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="white"
-    >
-      <g transform="scale(0.8) translate(75,-10)">
-        <path
-          d="M318.563 221.755C300.863 221.755 284.979 211.247 278.206 194.978L196.549 0H244.342L318.842 178.361L393.273 0H441.066L358.92 195.048C352.112 211.247 336.263 221.755 318.563 221.755Z"
-          className="fill-logo"
-        />
-        <path
-          d="M425.111 314.933C407.481 314.933 391.667 304.494 384.824 288.366C377.947 272.097 381.507 253.524 393.936 240.921L542.657 90.2803L561.229 134.094L425.076 271.748L619.147 270.666L637.72 314.479L425.146 315.003L425.076 314.933H425.111Z"
-          className="fill-logo"
-        />
-        <path
-          d="M0 314.408L18.5727 270.595L212.643 271.677L76.525 133.988L95.0977 90.1748L243.819 240.816C256.247 253.384 259.843 272.026 252.93 288.26C246.088 304.424 230.203 314.827 212.643 314.827L0.0698221 314.339L0 314.408Z"
-          className="fill-logo"
-        />
-      </g>
-    </svg>
-  )
-}
-
 export const OpenAIIcon = ({ size = 16 }) => {
   return (
     <svg
@@ -34,7 +6,7 @@ export const OpenAIIcon = ({ size = 16 }) => {
       strokeLinejoin="round"
       viewBox="0 0 16 16"
       width={size}
-      style={{ color: 'currentcolor' }}
+      style={{ color: "currentcolor" }}
     >
       <path
         transform="scale(0.8) translate(2,2)"
@@ -42,26 +14,8 @@ export const OpenAIIcon = ({ size = 16 }) => {
         fill="currentColor"
       ></path>
     </svg>
-  )
-}
-
-export const ReplicateIcon = ({ size = 16 }) => {
-  return (
-    <svg
-      height={size}
-      width={size}
-      viewBox="0 0 1500 1500"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ color: 'currentcolor' }}
-    >
-      <g fill="white" transform="scale(0.8) translate(450,450)">
-        <polygon points="1000,427.6 1000,540.6 603.4,540.6 603.4,1000 477,1000 477,427.6" />
-        <polygon points="1000,213.8 1000,327 364.8,327 364.8,1000 238.4,1000 238.4,213.8" />
-        <polygon points="1000,0 1000,113.2 126.4,113.2 126.4,1000 0,1000 0,0" />
-      </g>
-    </svg>
-  )
-}
+  );
+};
 
 export const VertexIcon = ({ size = 16 }) => {
   return (
@@ -70,7 +24,7 @@ export const VertexIcon = ({ size = 16 }) => {
       width={size}
       viewBox="0 0 512 512"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ color: 'currentcolor' }}
+      style={{ color: "currentcolor" }}
     >
       <g transform="scale(0.8) translate(65,65)">
         <path
@@ -109,5 +63,5 @@ export const VertexIcon = ({ size = 16 }) => {
         <circle cx="192" cy="337" r="16" fill="white" />
       </g>
     </svg>
-  )
-}
+  );
+};
