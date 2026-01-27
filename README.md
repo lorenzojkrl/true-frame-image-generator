@@ -1,4 +1,4 @@
-  <h1 align="center">TrueFrame Image Generator</h1>
+<h1 align="center">TrueFrame Image Generator</h1>
 
 <p align="center">
   <a href="#features"><strong>Features</strong></a> ·
@@ -71,3 +71,5 @@ We are currently using Gemini, more will be added.
 ## Author
 
 Lorenzo Zarantonello for TrueFrame
+
+Confirmed
